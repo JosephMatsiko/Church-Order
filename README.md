@@ -26,6 +26,18 @@ vercel --prod        # production
 Or push the repo to GitHub and import it at vercel.com. No configuration is needed:
 every page except the API route is prerendered at build time.
 
+### Hosting behaviour
+
+`vercel.json` carries the cache policy (immutable for hashed `/_next/static/`
+assets, a week for images) and the security headers, so it stays in version
+control and travels with the branch rather than living in the dashboard.
+
+There is deliberately no Content-Security-Policy yet: the app ships an inline
+theme script and Next injects its own inline hydration scripts, so a policy
+strict enough to be worth having needs nonces, and one loose enough to work
+without them (`script-src 'unsafe-inline'`) buys little. Worth adding against a
+real deployment, where it can be tested.
+
 ### The canonical origin
 
 Open Graph and Twitter card images are absolute URLs, so the build needs to know the
