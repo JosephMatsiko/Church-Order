@@ -32,11 +32,30 @@ every page except the API route is prerendered at build time.
 assets, a week for images) and the security headers, so it stays in version
 control and travels with the branch rather than living in the dashboard.
 
-There is deliberately no Content-Security-Policy yet: the app ships an inline
-theme script and Next injects its own inline hydration scripts, so a policy
-strict enough to be worth having needs nonces, and one loose enough to work
-without them (`script-src 'unsafe-inline'`) buys little. Worth adding against a
-real deployment, where it can be tested.
+The Content-Security-Policy was arrived at by measurement: every directive was
+tightened until a browser reported a violation, then relaxed by exactly what
+the app needs. Every directive but one is strict.
+
+`script-src` carries `'unsafe-inline'` because it has to. Three inline scripts
+ship on every page: the theme script that prevents a flash of the wrong colour
+scheme, Next's `__next_f` bootstrap, and the per-page RSC payload. The first two
+are byte-identical across pages and could be hashed; the third is unique to each
+of the seventy-nine pages and changes every build, so hashes cannot cover it.
+The alternative is a per-request nonce from middleware, which would make every
+page dynamic and give up the prerendering this site is built on. Nothing
+user-supplied is ever rendered into the page as markup, so that trade is not
+worth making here.
+
+What the policy still buys: no script from another origin, no plugins or
+objects, no `<base>` hijacking, no framing, and forms may only post to this
+origin.
+
+`framework` is set explicitly rather than left to detection, so a project whose
+preset was set wrong at import still builds as Next.
+
+To re-verify after a change, serve the site behind these exact headers and load
+it in a real browser with `securitypolicyviolation` logged; a passing build is
+not evidence that the policy holds.
 
 ### The canonical origin
 
