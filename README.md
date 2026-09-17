@@ -26,13 +26,23 @@ vercel --prod        # production
 Or push the repo to GitHub and import it at vercel.com. No configuration is needed:
 every page except the API route is prerendered at build time.
 
+### The canonical origin
+
+Open Graph and Twitter card images are absolute URLs, so the build needs to know the
+site's origin. Vercel sets `VERCEL_PROJECT_PRODUCTION_URL` to the project's production
+domain (the custom domain once one is attached, otherwise the `.vercel.app` one), and
+`src/app/layout.tsx` reads it, so there is normally nothing to set. Override it with
+the `SITE_URL` environment variable; the literal in that file is only a last resort
+when neither is set, and is worth correcting if the Vercel project is named something
+other than `church-order`.
+
 ### Optional: the Ask box
 
 Each lesson can carry a question box that answers from that lesson's own material.
 It appears only when an API key is present.
 
 1. In the Vercel project, add an environment variable `ANTHROPIC_API_KEY`.
-2. Optionally set `ANTHROPIC_MODEL` (defaults to `claude-sonnet-4-5`).
+2. Optionally set `ANTHROPIC_MODEL` (defaults to `claude-sonnet-5`).
 3. Redeploy.
 
 Locally, put the same key in `.env.local`. The key never reaches the browser: the call

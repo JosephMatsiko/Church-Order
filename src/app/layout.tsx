@@ -10,7 +10,19 @@ const read = Newsreader({ subsets: ["latin"], variable: "--font-read", style: ["
 const ui = Geist({ subsets: ["latin"], variable: "--font-ui", display: "swap" });
 const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
+// Canonical origin for the Open Graph and Twitter card images. Vercel sets
+// VERCEL_PROJECT_PRODUCTION_URL to the project's production domain (the custom
+// domain once one is attached, otherwise the .vercel.app one), so this tracks
+// the real origin without a hardcoded guess. SITE_URL overrides it for local
+// previews; the literal is only a last resort when neither is set.
+const SITE =
+  process.env.SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "https://church-order.vercel.app");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE),
   title: { default: meta.title, template: `%s · ${meta.title}` },
   description: meta.sub,
   applicationName: "Decently and in Order",

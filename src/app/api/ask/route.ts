@@ -1,6 +1,6 @@
 // Optional. Works once ANTHROPIC_API_KEY is set in the Vercel project.
 // Without the key the lesson pages never render the Ask box.
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const RULES = [
   "You are teaching Presbyterian church government as the Presbyterian Church in America holds it.",
@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       "anthropic-version": "2023-06-01",
     },
     body: JSON.stringify({
-      model: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5",
+      model: process.env.ANTHROPIC_MODEL ?? "claude-sonnet-5",
       max_tokens: 700,
       system: RULES,
       messages: [{ role: "user", content: `LESSON: ${body.title ?? ""}\n\nQUESTION: ${question}\n\nMATERIAL:\n${material}` }],

@@ -1,0 +1,33 @@
+name: Build
+
+# Deploys are handled by Vercel's Git integration, not from here: Vercel builds
+# and ships every push to main, and every pull request as a preview. This
+# workflow is only the build check, so a broken build shows up on the pull
+# request rather than only in Vercel's dashboard.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
