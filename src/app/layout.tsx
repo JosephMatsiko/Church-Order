@@ -15,11 +15,26 @@ const mono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: 
 // domain once one is attached, otherwise the .vercel.app one), so this tracks
 // the real origin without a hardcoded guess. SITE_URL overrides it for local
 // previews; the literal is only a last resort when neither is set.
-const SITE =
-  process.env.SITE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+//
+// `new URL` throws on a blank or scheme-less value, and a throw here fails the
+// whole build, so SITE_URL is used only when it parses: blank counts as unset,
+// and a bare host gets https://.
+function siteOrigin(): string {
+  const fallback = process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "https://church-order.vercel.app");
+    : "https://church-order.vercel.app";
+  const raw = process.env.SITE_URL?.trim();
+  if (!raw) return fallback;
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  try {
+    new URL(candidate);
+    return candidate;
+  } catch {
+    return fallback;
+  }
+}
+
+const SITE = siteOrigin();
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
